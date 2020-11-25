@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { User } from "src/modules/db/entities/user.entity";
 import { UserRepository } from "src/modules/db/repositories/user.repository";
 
@@ -6,7 +6,10 @@ import { UserRepository } from "src/modules/db/repositories/user.repository";
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
 
-  createUser(email: string, password: string): Promise<User> {
+  async createUser(email: string, password: string): Promise<User> {
+    if (await this.userRepository.findUserByEmail(email)) {
+      throw new HttpException('email already in use', HttpStatus.CONFLICT)
+    }
     const user = new User();
 
     user.email = email;
