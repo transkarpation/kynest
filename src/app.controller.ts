@@ -1,7 +1,9 @@
-import { Controller, Request, Get, Post, UseGuards } from '@nestjs/common';
+import { Controller, Request, Get, Post, UseGuards, Body } from '@nestjs/common';
 import { AppService } from './app.service';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth/auth.service';
+import { LoginDto } from './login.dto';
+import {ApiBody, ApiOkResponse} from '@nestjs/swagger'
 
 @Controller()
 export class AppController {
@@ -10,13 +12,10 @@ export class AppController {
     private authService: AuthService
   ) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
-  }
-
   @UseGuards(AuthGuard('local'))
   @Post('auth/login')
+  @ApiBody({ type: LoginDto })
+  @ApiOkResponse({ description: 'result Token' })
   async login(@Request() req) {
     return this.authService.login(req.user);return req.user;
   }
